@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
+	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/rivo/tview"
 	"github.com/sanoyo/vislam/internal/color"
 	"github.com/sanoyo/vislam/internal/utils"
@@ -14,10 +14,10 @@ import (
 
 type clusterView struct {
 	view
-	clusters []types.FunctionConfiguration
+	clusters []types.Cluster
 }
 
-func newFunctionView(functions []types.FunctionConfiguration, app *App) *clusterView {
+func newClusterView(clusters []types.Cluster, app *App) *clusterView {
 	keys := append(basicKeyInputs, []keyDescriptionPair{
 		hotKeyMap["n"],
 	}...)
@@ -25,21 +25,9 @@ func newFunctionView(functions []types.FunctionConfiguration, app *App) *cluster
 		view: *newView(app, keys, secondaryPageKeyMap{
 			DescriptionKind: describePageKeys,
 		}),
-		clusters: functions,
+		clusters: clusters,
 	}
 }
-
-// func newClusterView(clusters []types.Cluster, app *App) *clusterView {
-// 	keys := append(basicKeyInputs, []keyDescriptionPair{
-// 		hotKeyMap["n"],
-// 	}...)
-// 	return &clusterView{
-// 		view: *newView(app, keys, secondaryPageKeyMap{
-// 			DescriptionKind: describePageKeys,
-// 		}),
-// 		clusters: clusters,
-// 	}
-// }
 
 func (app *App) showClustersPage(reload bool) error {
 	app.kind = ClusterKind
@@ -47,20 +35,19 @@ func (app *App) showClustersPage(reload bool) error {
 		return nil
 	}
 
-	funcitions, err := app.Store.ListFunctions()
+	clusters, err := app.Store.ListFunctions()
 	if err != nil {
-		fmt.Println("ccc")
 		slog.Error("failed to load funcitions", "region", app.Region, "error", err.Error())
 		return err
 	}
 
-	if len(funcitions) == 0 {
+	if len(clusters) == 0 {
 		m := fmt.Sprintf("there is no valid funcitions in %s region", app.Region)
 		slog.Warn("failed start", "reason", m)
 		return fmt.Errorf(m)
 	}
 
-	view := newFunctionView(funcitions, app)
+	view := newClusterView(clusters, app)
 	page := buildAppPage(view)
 	app.addAppPage(page)
 	view.table.Select(app.rowIndex, 0)
