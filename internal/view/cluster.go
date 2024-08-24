@@ -35,14 +35,14 @@ func (app *App) showClustersPage(reload bool) error {
 		return nil
 	}
 
-	clusters, err := app.Store.ListClusters()
+	clusters, err := app.Store.ListFunctions()
 	if err != nil {
-		slog.Error("failed to load clusters", "region", app.Region, "error", err.Error())
+		slog.Error("failed to load funcitions", "region", app.Region, "error", err.Error())
 		return err
 	}
 
 	if len(clusters) == 0 {
-		m := fmt.Sprintf("there is no valid clusters in %s region", app.Region)
+		m := fmt.Sprintf("there is no valid funcitions in %s region", app.Region)
 		slog.Warn("failed start", "reason", m)
 		return fmt.Errorf(m)
 	}
